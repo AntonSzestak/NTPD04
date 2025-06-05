@@ -2,6 +2,7 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 import joblib
 import numpy as np
+import os
 
 app = FastAPI()
 model = joblib.load("model.pkl")
@@ -18,7 +19,8 @@ def predict(data: InputData):
     if len(data.features) != 4:
         raise HTTPException(status_code=400, detail="Wymagane dokładnie 4 cechy wejściowe.")
     prediction = model.predict([data.features])[0]
-    return {"prediction": int(prediction)}
+    author = os.getenv("AUTHOR", "unknown")
+    return {"prediction": int(prediction), "author": author}
 
 @app.get("/info")
 def info():
